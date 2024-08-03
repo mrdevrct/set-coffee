@@ -1,0 +1,52 @@
+.card {
+  width: 100%;
+  background: white;
+  color: #711d1c;
+  padding: 1rem;
+  height: auto;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem auto;
+  align-items: center;
+}
+
+.card div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.card div:nth-child(1) > div {
+  display: flex;
+  flex-direction: row-reverse; /* چینش عکس‌ها از سمت راست */
+  gap: 10px; /* فاصله بین عکس‌ها */
+}
+
+.card img {
+  width: 50px;
+}
+
+.price {
+  margin-top: 1rem;
+}
+
+.delete_btn {
+  font-size: 13px;
+  background: #711d1c;
+  padding: 0.4rem 0.7rem;
+  border: 0;
+  border-radius: 3px;
+  color: white;
+  cursor: pointer;
+  width: 100px; /* اندازه ثابت */
+  display: inline-block;
+  text-align: center;
+}
+
+.card ul {
+  list-style-type: none; /* حذف نقطه‌های پیش‌فرض لیست */
+  padding: 0;
+  margin: 0.5rem 0; /* فاصله بین لیست و متن */
+  text-align: right; /* مرکز چین کردن متن */
+}

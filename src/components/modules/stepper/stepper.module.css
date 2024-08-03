@@ -1,0 +1,89 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row-reverse;
+  gap: 18px;
+  padding-bottom: 3.8rem;
+}
+.active_step {
+  opacity: 1 !important;
+}
+.stepper_bg {
+  background-image: url(https://set-coffee.com/wp-content/uploads/2022/06/back1.jpg);
+  background-size: cover;
+  background-position: center center;
+  margin-bottom: 40px;
+  padding: 0 60px;
+  padding-top: 182px;
+}
+.stepper p,
+.stepper a {
+  display: inline-block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  font-size: 22px;
+  line-height: 1.2;
+  opacity: 0.7;
+  color: white;
+}
+.stepper svg {
+  font-size: 1.2rem;
+  opacity: 0.7;
+  color: white;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row-reverse;
+  gap: 18px;
+  padding-bottom: 3.8rem;
+}
+.active_step {
+  opacity: 1 !important;
+}
+.stepper_bg {
+  background-image: url(https://set-coffee.com/wp-content/uploads/2022/06/back1.jpg);
+  background-size: cover;
+  background-position: center center;
+  margin-bottom: 40px;
+  padding: 0 60px;
+  padding-top: 182px;
+}
+.stepper p,
+.stepper a {
+  display: inline-block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  font-size: 22px;
+  line-height: 1.2;
+  opacity: 0.7;
+  color: white;
+}
+.stepper svg {
+  font-size: 1.2rem;
+  opacity: 0.7;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .stepper_bg {
+    padding: 10px 35px;
+    padding-top: 100px;
+  }
+
+  .stepper {
+    gap: none;
+  }
+
+  .stepper a {
+    font-size: 16px;
+  }
+
+  .stepper p {
+    font-size: 14px;
+  }
+}

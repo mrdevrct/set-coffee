@@ -1,0 +1,86 @@
+.maps {
+  display: flex;
+  gap: 25px;
+}
+
+.container {
+  color: black;
+  text-align: right;
+  max-width: 1222px;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-bottom: 4rem;
+  margin-left: auto;
+}
+.maps section {
+  width: 50%;
+}
+.mapSection {
+  display: flex;
+  flex-direction: column;
+}
+.contents {
+  display: flex;
+  gap: 35px;
+}
+.contents section,
+.contents form {
+  width: 50%;
+  margin-top: 3rem;
+}
+
+.infoMap {
+  display: none;
+  margin-top: 18px;
+  margin-bottom: 30px;
+  padding: 7px 20px 15px 7px;
+  background-color: #ffffff;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  .maps {
+    flex-direction: column;
+    gap: 15px; /* می‌توانید فاصله دلخواه بین بخش‌ها را تنظیم کنید */
+  }
+
+  .maps section {
+    width: 100%;
+  }
+
+  .contents {
+    flex-direction: column;
+    gap: 25px; /* می‌توانید فاصله دلخواه بین بخش‌ها را تنظیم کنید */
+  }
+
+  .contents section,
+  .contents form {
+    width: 100%;
+    margin-top: 2rem; /* می‌توانید فاصله دلخواه از بالا را تنظیم کنید */
+  }
+
+  .infoMap {
+    display: block !important;
+  }
+
+  .infoMap span {
+    font-size: 13px;
+  }
+
+  .infoMap h3 {
+    margin-top: 8px;
+    font-size: 17px;
+  }
+
+  .infoMap p {
+    font-size: 13px;
+    margin-top: 5px;
+  }
+
+  .infoMap a {
+    font-size: 12px;
+    font-weight: bold;
+  }
+}

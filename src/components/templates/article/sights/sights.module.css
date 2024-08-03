@@ -1,0 +1,112 @@
+.contents {
+  margin-top: 40px;
+  padding: 20px 0;
+  border-top: 1px solid rgba(128, 128, 128, 0.233);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.233);
+}
+
+.title {
+  margin-bottom: 10px;
+  font-size: 32px;
+  text-align: right;
+  margin-top: 1.7rem;
+  line-height: 1.2;
+}
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid rgba(128, 128, 128, 0.233);
+  border-radius: 8px;
+  flex-direction: row-reverse;
+}
+
+.userImage {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-left: 15px; /* Space between image and text */
+}
+
+.commentDetails {
+  flex: 1;
+  text-align: right;
+}
+
+.username {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.role {
+  font-size: 14px;
+  color: gray;
+  margin-bottom: 10px;
+}
+
+.date {
+  color: gray;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.message {
+  font-size: 1rem;
+}
+
+/* استایل برای ریپلای ها */
+.replay {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid rgba(0, 0, 255, 0.233);
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  width: 100%; /* عرض کامل برای حالت ریسپانسیو */
+}
+
+.replayUser {
+  font-size: 0.9rem;
+  color: #007bff;
+  margin-bottom: 5px;
+}
+
+@media (max-width: 1024px) {
+  .title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 18px;
+    margin-top: 1rem;
+  }
+
+  .replayUser {
+    font-size: 0.8rem;
+  }
+
+  .replay {
+    width: 100%;
+  }
+
+  .comment {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .commentDetails {
+    text-align: right;
+    width: 100%;
+  }
+
+  .userInfo {
+    display: flex;
+    justify-content: right;
+    gap: 8px;
+  }
+
+}

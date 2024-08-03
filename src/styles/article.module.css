@@ -1,0 +1,40 @@
+.container {
+  color: black;
+  text-align: right;
+  max-width: 1222px;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-bottom: 4rem;
+  margin-left: auto;
+}
+.container section strong {
+  color: black;
+}
+.container section {
+  margin-top: 20px;
+}
+.container section p {
+  margin-bottom: 10px;
+  direction: rtl;
+  font-size: 1.1rem;
+  line-height: 2.2rem;
+  color: gray;
+}
+
+@media (max-width: 1024px) {
+  .container section p {
+    font-size: 18px;
+    line-height: 2rem;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container section p {
+    font-size: 14px;
+    line-height: 1.8rem;
+    margin-bottom: 4px;
+  }
+}

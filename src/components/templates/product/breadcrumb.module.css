@@ -1,0 +1,33 @@
+.breadcrumbContainer {
+  overflow-x: auto;
+  white-space: nowrap;
+  margin-bottom: 15px;
+}
+
+.breadcrumbContainer::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for WebKit browsers */
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  direction: rtl;
+  font-size: 15px;
+  gap: 9px;
+}
+
+.breadcrumb a {
+  color: rgb(144, 140, 140);
+}
+
+.breadcrumb span {
+  position: relative;
+  top: 2px;
+}
+
+@media (max-width: 600px) {
+  .breadcrumb {
+    font-size: 14px;
+    gap: 4px;
+  }
+}

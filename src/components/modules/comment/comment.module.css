@@ -1,0 +1,73 @@
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+}
+
+.details {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.comment_mobile {
+  display: none;
+  border-bottom: 1px solid rgb(94, 94, 94);
+  margin-top: 0.5rem;
+  padding: 12px 0 20px 0;
+}
+
+.user_details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.body{
+  font-size: 15px;
+  padding: 0 15px 0 0; 
+}
+
+.stars{
+  color: orange;
+  display: flex;
+  gap: 4px;
+}
+
+
+.comment{
+  width: 100%;
+  display: flex;
+  margin-top: 1rem;
+  padding: 10px 0 30px 0;
+  border-bottom: 1px solid rgb(94, 94, 94);
+  gap: 20px;
+}
+
+.userInfo{
+  display: flex;
+  gap: 5px;
+}
+
+.details_comment{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.replay{
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: lightgray;
+}
+
+@media (max-width : 600px){
+  .comment{
+    display: none;
+  }
+
+  .comment_mobile{
+    display: block;
+  }
+}

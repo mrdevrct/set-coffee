@@ -1,0 +1,10 @@
+.moreinfo_rows {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 1024px) {
+  .moreinfo_rows {
+    font-size: 15px;
+  }
+}
