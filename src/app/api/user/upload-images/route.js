@@ -36,7 +36,7 @@ export async function PUT(req) {
     await fs.writeFile(imgPath, buffer);
 
     const updateUser = {
-      img: `https://set-coffee-omega.vercel.app/users-image/${filename}`,
+      img: `https://set-coffee-omega.vercel.app/uploads/users-image/${filename}`,
     };
 
     await UserModel.findOneAndUpdate({ _id: user._id }, { $set: updateUser });

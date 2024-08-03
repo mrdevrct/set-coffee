@@ -189,7 +189,7 @@ export async function PUT(req) {
       const filename = Date.now() + img.name;
       const imgPath = path.join(process.cwd(), "public/uploads/" + filename);
       await fs.writeFile(imgPath, buffer);
-      updateData.img = `https://set-coffee-omega.vercel.app/${filename}`;
+      updateData.img = `https://set-coffee-omega.vercel.app/uploads/${filename}`;
     } else {
       updateData.img = isExitsProduct.img; // Retain the existing image URL if no new image is provided
     }
