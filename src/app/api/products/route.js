@@ -41,7 +41,7 @@ export async function POST(req) {
       smell,
       inventory,
       tags,
-      img: `http://localhost:3000/uploads/${filename}`,
+      img: `https://set-coffee-omega.vercel.app/uploads/${filename}`,
     });
 
     return Response.json(
@@ -189,7 +189,7 @@ export async function PUT(req) {
       const filename = Date.now() + img.name;
       const imgPath = path.join(process.cwd(), "public/uploads/" + filename);
       await fs.writeFile(imgPath, buffer);
-      updateData.img = `http://localhost:3000/uploads/${filename}`;
+      updateData.img = `https://set-coffee-omega.vercel.app/${filename}`;
     } else {
       updateData.img = isExitsProduct.img; // Retain the existing image URL if no new image is provided
     }

@@ -46,7 +46,7 @@ export async function POST(req) {
       coverFilename
     );
     await fs.writeFile(coverImgPath, coverBuffer);
-    const coverImageURL = `http://localhost:3000/uploads/${coverFilename}`;
+    const coverImageURL = `https://set-coffee-omega.vercel.app/${coverFilename}`;
 
     // آپلود عکس‌های اضافی
     const imageUrls = [];
@@ -55,7 +55,7 @@ export async function POST(req) {
       const filename = Date.now() + path.extname(image.name); // Use path.extname to get the extension
       const imgPath = path.join(process.cwd(), "public/uploads", filename);
       await fs.writeFile(imgPath, buffer);
-      imageUrls.push(`http://localhost:3000/uploads/${filename}`);
+      imageUrls.push(`https://set-coffee-omega.vercel.app/${filename}`);
     }
 
     await ArticleModel.create({
@@ -111,7 +111,7 @@ export async function PUT(req) {
       const coverFilename = Date.now() + path.extname(cover_image.name);
       const coverImgPath = path.join(process.cwd(), "public/uploads", coverFilename);
       await fs.writeFile(coverImgPath, coverBuffer);
-      coverImageURL = `http://localhost:3000/uploads/${coverFilename}`;
+      coverImageURL = `https://set-coffee-omega.vercel.app/${coverFilename}`;
     }
 
     const imageUrls = [...existing_images];
@@ -120,7 +120,7 @@ export async function PUT(req) {
       const filename = Date.now() + path.extname(image.name);
       const imgPath = path.join(process.cwd(), "public/uploads", filename);
       await fs.writeFile(imgPath, buffer);
-      imageUrls.push(`http://localhost:3000/uploads/${filename}`);
+      imageUrls.push(`https://set-coffee-omega.vercel.app/${filename}`);
     }
 
     const newData = {
