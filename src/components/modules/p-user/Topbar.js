@@ -21,7 +21,7 @@ const Topbar = ({ name, img }) => {
             <p>{name || "کاربر ست کافی"}</p>
             <span>کاربر</span>
           </div>
-          <img src={img || "/images/shahin.jpg"} alt="" />
+          <img src={img || "/images/user-icon.png"} alt="" />
         </div>
 
         <h1>پنل کاربری</h1>

@@ -10,10 +10,7 @@ function Sights({ sights }) {
         .map((sight) => (
           <div key={sight._id} className={styles.comment}>
             <img
-              src={
-                sight.user.img ||
-                "https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
-              }
+              src={sight.user.img || "/images/user-icon.png"}
               alt="User"
               className={styles.userImage}
             />

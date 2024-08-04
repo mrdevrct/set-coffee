@@ -15,7 +15,7 @@ const Topbar = ({ name, img }) => {
             <p>{name || "کاربر ست کافی"}</p>
             <span>ادمین</span>
           </div>
-          <img src={img || "/images/shahin.jpg"} alt="" />
+          <img src={img || "/images/user-icon.png"} alt="" />
         </div>
 
         <h1 style={{ marginTop: "10px" }}>پنل مدیریت</h1>

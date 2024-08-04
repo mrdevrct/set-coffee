@@ -105,7 +105,7 @@ const Sms = ({ hideOtpForm, identifier }) => {
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="لطفاً کد ارسال شده وارد کنید"
-          autoComplete="off"
+          autoComplete="one-time-code"
         />
 
         <input
@@ -114,7 +114,7 @@ const Sms = ({ hideOtpForm, identifier }) => {
           placeholder="رمز عبور جدید را وارد کنید"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          autoComplete="off"
+          autoComplete="new-password"
         />
         <input
           className={styles.input}
@@ -122,7 +122,7 @@ const Sms = ({ hideOtpForm, identifier }) => {
           placeholder="تکرار رمز عبور جدید را وارد کنید"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          autoComplete="off"
+          autoComplete="new-password"
         />
         <button
           style={{ marginTop: "1rem" }}

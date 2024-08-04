@@ -22,7 +22,7 @@ const Comment = ({
       <section className={styles.comment_mobile}>
         <div className={styles.details}>
           <img
-            src={userID.img || "/images/shahin.jpg"}
+            src={userID.img || "/images/user-icon.png"}
             className={styles.avatar}
             alt=""
           />
