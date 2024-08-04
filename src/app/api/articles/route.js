@@ -3,59 +3,65 @@ import ArticleModel from "@/models/Article";
 import { authAdmin, authUser } from "@/utils/isLogin";
 import { promises as fs } from "fs";
 import path from "path";
+import { S3 } from "aws-sdk";
+
+const s3 = new S3({
+  endpoint: process.env.LIARA_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.LIARA_ACCESS_KEY,
+    secretAccessKey: process.env.LIARA_SECRET_KEY,
+  },
+});
 
 export async function POST(req) {
   try {
     const isAdmin = await authAdmin();
     if (!isAdmin) {
-      throw Error("This is api protected and you can't access is !!!");
+      throw new Error("This is api protected and you can't access it !!!");
     }
 
-    connectToDB(); // Ensure database is connected
+    await connectToDB();
     const user = await authUser();
     const formData = await req.formData();
     const title = formData.get("title");
     const author = formData.get("author");
     const body = formData.get("body");
     const cover_image = formData.get("cover_image");
-    const images = formData.getAll("images"); // Use getAll to get an array of images
+    const images = formData.getAll("images");
 
-    if (!title.trim()) {
-      return Response.json({ message: " title is required" }, { status: 400 });
-    }
-    if (!author.trim()) {
-      return Response.json({ message: " author is required" }, { status: 400 });
-    }
-    if (!body.trim()) {
-      return Response.json({ message: " body is required" }, { status: 400 });
-    }
-
-    if (!cover_image) {
-      return Response.json(
-        { message: " cover_image is required" },
+    if (!title.trim() || !author.trim() || !body.trim() || !cover_image) {
+      return new Response(
+        JSON.stringify({ message: "Required fields are missing" }),
         { status: 400 }
       );
     }
 
-    // آپلود cover image
     const coverBuffer = Buffer.from(await cover_image.arrayBuffer());
-    const coverFilename = Date.now() + path.extname(cover_image.name); // Use path.extname to get the extension
-    const coverImgPath = path.join(
-      process.cwd(),
-      "public/uploads",
-      coverFilename
-    );
-    await fs.writeFile(coverImgPath, coverBuffer);
-    const coverImageURL = `https://set-coffee-omega.vercel.app/uploads/${coverFilename}`;
+    const coverFilename = Date.now() + path.extname(cover_image.name);
+    const coverUploadParams = {
+      Bucket: process.env.LIARA_BUCKET_NAME,
+      Key: `articles/cover/${coverFilename}`,
+      Body: coverBuffer,
+      ContentType: cover_image.type,
+      ACL: "public-read",
+    };
+    const { Location: coverImageURL } = await s3
+      .upload(coverUploadParams)
+      .promise();
 
-    // آپلود عکس‌های اضافی
     const imageUrls = [];
     for (const image of images) {
       const buffer = Buffer.from(await image.arrayBuffer());
-      const filename = Date.now() + path.extname(image.name); // Use path.extname to get the extension
-      const imgPath = path.join(process.cwd(), "public/uploads", filename);
-      await fs.writeFile(imgPath, buffer);
-      imageUrls.push(`https://set-coffee-omega.vercel.app/uploads/${filename}`);
+      const filename = Date.now() + path.extname(image.name);
+      const uploadParams = {
+        Bucket: process.env.LIARA_BUCKET_NAME,
+        Key: `articles/images/${filename}`,
+        Body: buffer,
+        ContentType: image.type,
+        ACL: "public-read",
+      };
+      const { Location: imageUrl } = await s3.upload(uploadParams).promise();
+      imageUrls.push(imageUrl);
     }
 
     await ArticleModel.create({
@@ -67,12 +73,15 @@ export async function POST(req) {
       images: imageUrls,
     });
 
-    return Response.json(
-      { message: "created Article successfully" },
+    return new Response(
+      JSON.stringify({ message: "Article created successfully" }),
       { status: 201 }
     );
   } catch (err) {
-    return Response.json({ message: err }, { status: 500 });
+    console.error(err);
+    return new Response(JSON.stringify({ message: err.message }), {
+      status: 500,
+    });
   }
 }
 
@@ -80,10 +89,10 @@ export async function PUT(req) {
   try {
     const isAdmin = await authAdmin();
     if (!isAdmin) {
-      throw Error("This API is protected and you can't access it!");
+      throw new Error("This API is protected and you can't access it!");
     }
 
-    connectToDB();
+    await connectToDB();
     const user = await authUser();
     const formData = await req.formData();
     const id = formData.get("id");
@@ -95,32 +104,77 @@ export async function PUT(req) {
     const images = formData.getAll("images");
     const existing_images = formData.getAll("existing_images");
 
-    if (!title.trim()) {
-      return Response.json({ message: "title is required" }, { status: 400 });
-    }
-    if (!author.trim()) {
-      return Response.json({ message: "author is required" }, { status: 400 });
-    }
-    if (!body.trim()) {
-      return Response.json({ message: "body is required" }, { status: 400 });
+    if (!title.trim() || !author.trim() || !body.trim()) {
+      return Response.json(
+        { message: "Required fields are missing" },
+        { status: 400 }
+      );
     }
 
+    const article = await ArticleModel.findOne({ _id: id });
+    if (!article) {
+      return Response.json(
+        { message: "Article not found" },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    // Delete existing cover image if a new one is provided
     let coverImageURL = cover_image_url;
     if (cover_image && cover_image instanceof File) {
+      if (cover_image_url) {
+        const coverImageKey = new URL(cover_image_url).pathname
+          .split("/")
+          .pop();
+        const deleteParams = {
+          Bucket: process.env.LIARA_BUCKET_NAME,
+          Key: `articles/cover/${coverImageKey}`,
+        };
+        await s3.deleteObject(deleteParams).promise();
+      }
+
       const coverBuffer = Buffer.from(await cover_image.arrayBuffer());
       const coverFilename = Date.now() + path.extname(cover_image.name);
-      const coverImgPath = path.join(process.cwd(), "public/uploads", coverFilename);
-      await fs.writeFile(coverImgPath, coverBuffer);
-      coverImageURL = `https://set-coffee-omega.vercel.app/uploads/${coverFilename}`;
+      const coverUploadParams = {
+        Bucket: process.env.LIARA_BUCKET_NAME,
+        Key: `articles/cover/${coverFilename}`,
+        Body: coverBuffer,
+        ContentType: cover_image.type,
+        ACL: "public-read",
+      };
+      const { Location: newCoverImageURL } = await s3
+        .upload(coverUploadParams)
+        .promise();
+      coverImageURL = newCoverImageURL;
     }
 
     const imageUrls = [...existing_images];
-    for (const image of images) {
-      const buffer = Buffer.from(await image.arrayBuffer());
-      const filename = Date.now() + path.extname(image.name);
-      const imgPath = path.join(process.cwd(), "public/uploads", filename);
-      await fs.writeFile(imgPath, buffer);
-      imageUrls.push(`https://set-coffee-omega.vercel.app/uploads/${filename}`);
+    if (images.length > 0) {
+      for (const oldImageUrl of existing_images) {
+        const oldImageKey = new URL(oldImageUrl).pathname.split("/").pop();
+        const deleteParams = {
+          Bucket: process.env.LIARA_BUCKET_NAME,
+          Key: `articles/images/${oldImageKey}`,
+        };
+        await s3.deleteObject(deleteParams).promise();
+      }
+
+      // Upload new images
+      for (const image of images) {
+        const buffer = Buffer.from(await image.arrayBuffer());
+        const filename = Date.now() + path.extname(image.name);
+        const uploadParams = {
+          Bucket: process.env.LIARA_BUCKET_NAME,
+          Key: `articles/images/${filename}`,
+          Body: buffer,
+          ContentType: image.type,
+          ACL: "public-read",
+        };
+        const { Location: imageUrl } = await s3.upload(uploadParams).promise();
+        imageUrls.push(imageUrl);
+      }
     }
 
     const newData = {
@@ -134,13 +188,15 @@ export async function PUT(req) {
 
     await ArticleModel.findOneAndUpdate({ _id: id }, { $set: newData });
 
-    return Response.json({ message: "updated Article successfully" }, { status: 200 });
+    return Response.json(
+      { message: "Article updated successfully" },
+      { status: 200 }
+    );
   } catch (err) {
-    console.log(err);
-    return Response.json({ message: err }, { status: 500 });
+    console.error(err);
+    return Response.json({ message: err.message }, { status: 500 });
   }
 }
-
 
 export async function DELETE(req) {
   try {

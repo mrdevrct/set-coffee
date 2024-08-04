@@ -3,51 +3,81 @@ import { authUser } from "@/utils/isLogin";
 import UserModel from "@/models/User";
 import { promises as fs } from "fs";
 import path from "path";
+import { S3 } from "aws-sdk";
+
+const s3 = new S3({
+  endpoint: process.env.LIARA_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.LIARA_ACCESS_KEY,
+    secretAccessKey: process.env.LIARA_SECRET_KEY,
+  },
+});
 
 export async function PUT(req) {
   try {
-    connectToDB();
+    await connectToDB();
     const user = await authUser();
     const formData = await req.formData();
-
     const img = formData.get("img");
 
     if (!img) {
-      return new Response(JSON.stringify({ message: "img is required" }), {
-        status: 400,
-      });
+      return Response.json(
+        { message: "Image is required" },
+        {
+          status: 400,
+        }
+      );
     }
 
-    const isExsitsUser = await UserModel.findOne({ _id: user._id });
-    if (!isExsitsUser) {
-      return new Response(JSON.stringify({ message: "user is not found!!!" }), {
-        status: 400,
-      });
+    const existingUser = await UserModel.findOne({ _id: user._id });
+    if (!existingUser) {
+      return Response.json(
+        { message: "User not found" },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    let previousImgUrl = existingUser.img;
+
+    if (previousImgUrl) {
+      const previousImgKey = previousImgUrl.split("/").pop();
+      const deleteParams = {
+        Bucket: process.env.LIARA_BUCKET_NAME,
+        Key: `users-image/${previousImgKey}`,
+      };
+
+      await s3.deleteObject(deleteParams).promise();
     }
 
     const buffer = Buffer.from(await img.arrayBuffer());
     const filename = Date.now() + path.extname(img.name);
-    const imgPath = path.join(
-      process.cwd(),
-      "public/uploads/users-image/",
-      filename
-    );
 
-    await fs.writeFile(imgPath, buffer);
-
-    const updateUser = {
-      img: `https://set-coffee-omega.vercel.app/uploads/users-image/${filename}`,
+    const uploadParams = {
+      Bucket: process.env.LIARA_BUCKET_NAME,
+      Key: `users-image/${filename}`,
+      Body: buffer,
+      ContentType: img.type,
+      ACL: "public-read",
     };
 
+    const { Location: imgUrl } = await s3.upload(uploadParams).promise();
+
+    const updateUser = { img: imgUrl };
     await UserModel.findOneAndUpdate({ _id: user._id }, { $set: updateUser });
-    return new Response(
-      JSON.stringify({ message: "updated image profile successfully" }),
+
+    return Response.json(
+      { message: "Profile image updated successfully", imgUrl },
       { status: 200 }
     );
   } catch (e) {
-    console.log(e);
-    return new Response(JSON.stringify({ message: e.message }), {
-      status: 500,
-    });
+    console.error(e);
+    return Response.json(
+      { message: e.message },
+      {
+        status: 500,
+      }
+    );
   }
 }

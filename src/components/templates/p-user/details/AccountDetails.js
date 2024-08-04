@@ -171,7 +171,7 @@ function AccountDetails() {
           </section>
           <section>
             <div className={styles.uploader}>
-              <img src={img || "http://localhost:3000/images/shahin.jpg"} alt="" />
+              <img src={img || "images/shahin.jpg"} alt="" />
               <div>
                 <div>
                   <button>

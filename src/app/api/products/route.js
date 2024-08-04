@@ -4,6 +4,15 @@ import { authAdmin } from "@/utils/isLogin";
 import mongoose from "mongoose";
 import { promises as fs } from "fs";
 import path from "path";
+import { S3 } from "aws-sdk";
+
+const s3 = new S3({
+  endpoint: process.env.LIARA_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.LIARA_ACCESS_KEY,
+    secretAccessKey: process.env.LIARA_SECRET_KEY,
+  },
+});
 
 export async function POST(req) {
   try {
@@ -26,11 +35,20 @@ export async function POST(req) {
     const img = formData.get("img");
 
     const buffer = Buffer.from(await img.arrayBuffer());
-    const filename = Date.now() + img.name;
-    const imgPath = path.join(process.cwd(), "public/uploads/" + filename);
+    const filename = Date.now() + "-" + img.name;
 
-    await fs.writeFile(imgPath, buffer);
+    const uploadParams = {
+      Bucket: process.env.LIARA_BUCKET_NAME,
+      Key: filename,
+      Body: buffer,
+      ContentType: img.type,
+      ACL: "public-read",
+    };
 
+    const { Location: imgUrl } = await s3.upload(uploadParams).promise();
+    console.log("Image Url => ", imgUrl);
+
+    // ذخیره محصول در دیتابیس
     const product = await ProductModel.create({
       name,
       price,
@@ -41,15 +59,23 @@ export async function POST(req) {
       smell,
       inventory,
       tags,
-      img: `https://set-coffee-omega.vercel.app/uploads/${filename}`,
+      img: imgUrl,
     });
+
+    console.log("Product => ", product);
 
     return Response.json(
       { message: "Product created successfully :))", data: product },
       { status: 201 }
     );
   } catch (err) {
-    return Response.json({ message: err }, { status: 500 });
+    console.error(err);
+    return Response.json(
+      { message: err.message },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
@@ -127,49 +153,35 @@ export async function PUT(req) {
     const tags = formData.get("tags");
     const img = formData.get("img");
 
-    if (!name) {
-      return Response.json({ message: "name is required" }, { status: 400 });
-    }
-
-    if (!price) {
-      return Response.json({ message: "price is required" }, { status: 400 });
-    }
-
-    if (!shortDesc) {
-      return Response.json({ message: "shortDesc is required" }, { status: 400 });
-    }
-
-    if (!longDesc) {
-      return Response.json({ message: "longDesc is required" }, { status: 400 });
-    }
-
-    if (!weight) {
-      return Response.json({ message: "weight is required" }, { status: 400 });
-    }
-
-    if (!suitableFor) {
-      return Response.json({ message: "suitableFor is required" }, { status: 400 });
-    }
-
-    if (!smell) {
-      return Response.json({ message: "smell is required" }, { status: 400 });
-    }
-
-    if (!inventory) {
-      return Response.json({ message: "inventory is required" }, { status: 400 });
-    }
-
-    if (!tags) {
-      return Response.json({ message: "tags is required" }, { status: 400 });
+    if (
+      !name ||
+      !price ||
+      !shortDesc ||
+      !longDesc ||
+      !weight ||
+      !suitableFor ||
+      !smell ||
+      !inventory ||
+      !tags
+    ) {
+      return Response.json(
+        { message: "All fields are required" },
+        { status: 400 }
+      );
     }
 
     if (!mongoose.isValidObjectId(id)) {
-      return Response.json({ message: "Product ID is not valid" }, { status: 401 });
+      return Response.json(
+        { message: "Product ID is not valid" },
+        { status: 400 }
+      );
     }
 
-    const isExitsProduct = await ProductModel.findOne({ _id: id });
-    if (!isExitsProduct) {
-      return Response.json({ message: "Product not found" }, { status: 404 });
+    const existingProduct = await ProductModel.findById(id);
+    if (!existingProduct) {
+      return new Response(JSON.stringify({ message: "Product not found" }), {
+        status: 404,
+      });
     }
 
     const updateData = {
@@ -186,20 +198,47 @@ export async function PUT(req) {
 
     if (img && img.size > 0) {
       const buffer = Buffer.from(await img.arrayBuffer());
-      const filename = Date.now() + img.name;
-      const imgPath = path.join(process.cwd(), "public/uploads/" + filename);
-      await fs.writeFile(imgPath, buffer);
-      updateData.img = `https://set-coffee-omega.vercel.app/uploads/${filename}`;
+      const filename = Date.now() + "-" + img.name;
+
+      const uploadParams = {
+        Bucket: process.env.LIARA_BUCKET_NAME,
+        Key: filename,
+        Body: buffer,
+        ContentType: img.type,
+        ACL: "public-read",
+      };
+
+      const { Location: imgUrl } = await s3.upload(uploadParams).promise();
+
+      // حذف تصویر قبلی از S3
+      const oldImgKey = existingProduct.img.split("/").pop();
+      if (oldImgKey) {
+        await s3
+          .deleteObject({
+            Bucket: process.env.LIARA_BUCKET_NAME,
+            Key: oldImgKey,
+          })
+          .promise();
+      }
+
+      updateData.img = imgUrl;
     } else {
-      updateData.img = isExitsProduct.img; // Retain the existing image URL if no new image is provided
+      updateData.img = existingProduct.img;
     }
 
-    await ProductModel.findOneAndUpdate({ _id: id }, { $set: updateData });
+    await ProductModel.findByIdAndUpdate(id, updateData, { new: true });
 
-    return Response.json({ message: "Product updated successfully" }, { status: 200 });
+    return Response.json(
+      { message: "Product updated successfully" },
+      { status: 200 }
+    );
   } catch (e) {
-    console.log(e);
-    return Response.json({ message: e.message }, { status: 500 });
+    console.error(e);
+    return Response.json(
+      { message: e.message },
+      {
+        status: 500,
+      }
+    );
   }
 }
-
